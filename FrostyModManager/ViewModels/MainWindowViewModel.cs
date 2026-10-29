@@ -102,7 +102,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     public MainWindowViewModel()
     {
-        Utils.BaseDirectory = Path.GetDirectoryName(AppContext.BaseDirectory) ?? string.Empty;
+        FrostyDirectories.Initialize();
         FrostyLogger.Logger = new UiLogger(line => Dispatcher.UIThread.Post(() => AddLog(line)));
 
         AvailableMods.CollectionChanged += (_, _) =>

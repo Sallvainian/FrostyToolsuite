@@ -139,8 +139,8 @@ internal static partial class Program
         // set logger
         FrostyLogger.Logger = new Logger();
 
-        // set base directory to the directory containing the executable
-        Utils.BaseDirectory = Path.GetDirectoryName(AppContext.BaseDirectory) ?? string.Empty;
+        // set base directory to the writable data directory
+        FrostyDirectories.Initialize();
 
         // init profile
         if (!ProfilesLibrary.Initialize(Path.GetFileNameWithoutExtension(game.Name)))

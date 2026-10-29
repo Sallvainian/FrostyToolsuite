@@ -19,7 +19,7 @@ internal static partial class Program
 
         // the profile decides how the initfs file is deobfuscated
         FrostyLogger.Logger = new Logger();
-        Utils.BaseDirectory = Path.GetDirectoryName(AppContext.BaseDirectory) ?? string.Empty;
+        FrostyDirectories.Initialize();
         if (!ProfilesLibrary.Initialize(Path.GetFileNameWithoutExtension(game.Name)))
         {
             return;

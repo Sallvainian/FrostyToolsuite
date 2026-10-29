@@ -20,6 +20,7 @@
       <None Update="Profiles\*.json" CopyToOutputDirectory="PreserveNewest" />
       <None Update="Sdk\Strings\*.json" CopyToOutputDirectory="PreserveNewest" />
       <None Update="ThirdParty\bcrypt.dll" CopyToOutputDirectory="PreserveNewest" />
+      <None Include="..\FrostyTypeSdkGenerator\FrostyTypeSdkGenerator\Meta\*.cs" Link="Meta\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
     <ItemGroup>

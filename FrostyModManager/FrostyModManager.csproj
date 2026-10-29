@@ -19,7 +19,11 @@
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.10" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-        <PackageReference Include="SharpCompress" Version="0.38.0" />
+        <PackageReference Include="SharpCompress" Version="0.50.7" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -32,5 +36,6 @@
         <None Include="..\FrostyCli\Profiles\*.json" Link="Profiles\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
         <None Include="..\FrostyCli\Sdk\Strings\*.json" Link="Sdk\Strings\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
         <None Include="..\FrostyCli\ThirdParty\bcrypt.dll" Link="ThirdParty\bcrypt.dll" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="..\FrostyTypeSdkGenerator\FrostyTypeSdkGenerator\Meta\*.cs" Link="Meta\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 </Project>

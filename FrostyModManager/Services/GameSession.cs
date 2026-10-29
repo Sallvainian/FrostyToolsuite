@@ -56,6 +56,12 @@ public sealed class GameSession
             return LoadVanilla();
         }
 
+        // never pull files out from under a running game
+        if (InitFsKeyFinder.FindGameProcess(Game.ExeName) is not null)
+        {
+            return Fail($"{Game.DisplayName} is running with compiled mods. Close the game, then reopen the mod manager.");
+        }
+
         GameInstaller.Uninstall(Game);
         try
         {
@@ -196,7 +202,7 @@ public sealed class GameSession
             string temp = Directory.CreateTempSubdirectory("frosty-import-").FullName;
             try
             {
-                using IArchive archive = ArchiveFactory.Open(inPath);
+                using IArchive archive = ArchiveFactory.OpenArchive(inPath);
                 foreach (IArchiveEntry entry in archive.Entries.Where(e => !e.IsDirectory && IsModFile(e.Key ?? string.Empty)))
                 {
                     // flatten, only the file name matters and it keeps entries from escaping the temp dir
