@@ -5,6 +5,7 @@
         x:Class="FrostyModManager.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="{Binding WindowTitle}"
+        Icon="/Assets/icon.png"
         Width="1440" Height="900" MinWidth="1000" MinHeight="620"
         Background="{StaticResource BgBrush}"
         DragDrop.AllowDrop="True">

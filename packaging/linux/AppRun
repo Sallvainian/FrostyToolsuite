@@ -1,0 +1,12 @@
+#!/bin/sh
+# AppImage entry point: starts the mod manager, or the command line tool with `<appimage> cli ...`
+HERE="$(dirname "$(readlink -f "$0")")"
+if [ -z "$DOTNET_SYSTEM_GLOBALIZATION_INVARIANT" ] && ! ls /usr/lib/libicuuc.so.* /usr/lib64/libicuuc.so.* \
+    /usr/lib/x86_64-linux-gnu/libicuuc.so.* /lib/x86_64-linux-gnu/libicuuc.so.* >/dev/null 2>&1; then
+    export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+fi
+if [ "$1" = "cli" ]; then
+    shift
+    exec "$HERE/usr/lib/frosty-mod-manager/FrostyCli" "$@"
+fi
+exec "$HERE/usr/lib/frosty-mod-manager/FrostyModManager" "$@"

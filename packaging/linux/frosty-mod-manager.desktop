@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Frosty Mod Manager
+GenericName=Mod Manager
+Comment=Install Frosty mods for Frostbite games like Dead Space
+Exec=frosty-mod-manager
+Icon=frosty-mod-manager
+Terminal=false
+Categories=Game;
+Keywords=frostbite;frosty;mods;fbmod;dead space;
+StartupWMClass=FrostyModManager

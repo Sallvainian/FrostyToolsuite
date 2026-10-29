@@ -1,0 +1,85 @@
+# Used by build.sh, which fills in ${VERSION}, ${STAGE} (the published app folder) and ${WRAPPERS} (the /usr/bin launchers).
+name: frosty-mod-manager
+arch: amd64
+platform: linux
+version: ${VERSION}
+version_schema: semver
+release: 1
+section: games
+priority: optional
+maintainer: Sallvainian <https://github.com/Sallvainian>
+description: |
+  Native Linux mod manager for Frostbite games (Dead Space and others supported by FrostyToolsuite v2).
+  Imports Frosty 1.x and 2.x mods, compiles them into the game folder and restores vanilla files.
+vendor: Sallvainian
+homepage: https://github.com/Sallvainian/FrostyToolsuite
+license: GPL-3.0-or-later
+
+contents:
+  - src: ${STAGE}/
+    dst: /usr/lib/frosty-mod-manager
+    type: tree
+  - src: ${WRAPPERS}/frosty-mod-manager
+    dst: /usr/bin/frosty-mod-manager
+    file_info: { mode: 0755 }
+  - src: ${WRAPPERS}/frosty
+    dst: /usr/bin/frosty
+    file_info: { mode: 0755 }
+  - src: ./frosty-mod-manager.desktop
+    dst: /usr/share/applications/frosty-mod-manager.desktop
+  - src: ./frosty-mod-manager.svg
+    dst: /usr/share/icons/hicolor/scalable/apps/frosty-mod-manager.svg
+  - src: ./icons/48.png
+    dst: /usr/share/icons/hicolor/48x48/apps/frosty-mod-manager.png
+  - src: ./icons/64.png
+    dst: /usr/share/icons/hicolor/64x64/apps/frosty-mod-manager.png
+  - src: ./icons/128.png
+    dst: /usr/share/icons/hicolor/128x128/apps/frosty-mod-manager.png
+  - src: ./icons/256.png
+    dst: /usr/share/icons/hicolor/256x256/apps/frosty-mod-manager.png
+  - src: ./icons/512.png
+    dst: /usr/share/icons/hicolor/512x512/apps/frosty-mod-manager.png
+  - src: ../../LICENSE
+    dst: /usr/share/licenses/frosty-mod-manager/LICENSE
+
+overrides:
+  deb:
+    depends:
+      - libc6
+      - libstdc++6
+      - zlib1g
+      - libssl3 | libssl3t64 | libssl1.1
+      - libfontconfig1
+      - libx11-6
+      - libice6
+      - libsm6
+    recommends:
+      - libicu74 | libicu76 | libicu72 | libicu70 | libicu-dev
+      - steam
+  rpm:
+    depends:
+      - libstdc++
+      - libz.so.1()(64bit)
+      - libssl.so.3()(64bit)
+      - libfontconfig.so.1()(64bit)
+      - libX11.so.6()(64bit)
+      - libICE.so.6()(64bit)
+      - libSM.so.6()(64bit)
+    recommends:
+      - libicu
+  archlinux:
+    depends:
+      - gcc-libs
+      - zlib
+      - openssl
+      - fontconfig
+      - libx11
+      - libice
+      - libsm
+      - icu
+
+rpm:
+  summary: Native Linux mod manager for Frostbite games
+  compression: zstd
+deb:
+  compression: zstd

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -22,6 +23,9 @@ public partial class MainWindow : Window
     {
         Patterns = new[] { "*.exe" }
     };
+
+    private static string Version =>
+        typeof(MainWindow).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0] ?? "2.0";
 
     private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext!;
 
@@ -109,8 +113,8 @@ public partial class MainWindow : Window
     private async void OnAbout(object? sender, RoutedEventArgs e)
     {
         await Dialogs.ConfirmAsync(this, "About",
-            "Frosty Mod Manager 2.0 for Linux\n\nA native mod manager built on the FrostyToolsuite v2 rewrite.\n" +
-            "github.com/Sallvainian/FrostyToolsuite (branch linux-native)");
+            $"Frosty Mod Manager {Version} for Linux\n\nA native mod manager built on the FrostyToolsuite v2 rewrite.\n" +
+            $"Data folder: {Frosty.Sdk.Utils.Utils.BaseDirectory}\n\ngithub.com/Sallvainian/FrostyToolsuite");
     }
 
     private void OnExit(object? sender, RoutedEventArgs e) => Close();
