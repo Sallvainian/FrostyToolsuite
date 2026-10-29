@@ -2,7 +2,245 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="FrostyModManager.App"
              RequestedThemeVariant="Dark">
+  <Application.Resources>
+    <!-- surfaces -->
+    <Color x:Key="BgColor">#0E1013</Color>
+    <SolidColorBrush x:Key="BgBrush" Color="#0E1013"/>
+    <SolidColorBrush x:Key="CardBrush" Color="#16191E"/>
+    <SolidColorBrush x:Key="RaisedBrush" Color="#1D2127"/>
+    <SolidColorBrush x:Key="HoverBrush" Color="#232830"/>
+    <SolidColorBrush x:Key="SelectedBrush" Color="#1B2E30"/>
+    <SolidColorBrush x:Key="StrokeBrush" Color="#262B33"/>
+
+    <!-- text -->
+    <SolidColorBrush x:Key="TextBrush" Color="#E8EAED"/>
+    <SolidColorBrush x:Key="MutedBrush" Color="#8B929C"/>
+    <SolidColorBrush x:Key="FaintBrush" Color="#5C636D"/>
+
+    <!-- RIG-glow accent -->
+    <Color x:Key="AccentColor">#3CCFC4</Color>
+    <SolidColorBrush x:Key="AccentBrush" Color="#3CCFC4"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#5FE0D6"/>
+    <SolidColorBrush x:Key="AccentSoftBrush" Color="#1F3C3D"/>
+    <SolidColorBrush x:Key="OnAccentBrush" Color="#06201E"/>
+    <SolidColorBrush x:Key="DangerBrush" Color="#F06A6A"/>
+    <SolidColorBrush x:Key="WarnBrush" Color="#E9B44C"/>
+
+    <!-- icons (Material Design paths) -->
+    <StreamGeometry x:Key="IconPlay">M8,5.14V19.14L19,12.14L8,5.14Z</StreamGeometry>
+    <StreamGeometry x:Key="IconBolt">M7,2V13H10V22L17,10H13L17,2H7Z</StreamGeometry>
+    <StreamGeometry x:Key="IconRestore">M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3</StreamGeometry>
+    <StreamGeometry x:Key="IconPlus">M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z</StreamGeometry>
+    <StreamGeometry x:Key="IconTrash">M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z</StreamGeometry>
+    <StreamGeometry x:Key="IconUp">M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z</StreamGeometry>
+    <StreamGeometry x:Key="IconDown">M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z</StreamGeometry>
+    <StreamGeometry x:Key="IconClose">M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z</StreamGeometry>
+    <StreamGeometry x:Key="IconSearch">M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z</StreamGeometry>
+    <StreamGeometry x:Key="IconCheck">M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z</StreamGeometry>
+    <StreamGeometry x:Key="IconPackage">M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5Z</StreamGeometry>
+    <StreamGeometry x:Key="IconFolder">M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z</StreamGeometry>
+    <StreamGeometry x:Key="IconMore">M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z</StreamGeometry>
+    <StreamGeometry x:Key="IconChevronRight">M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z</StreamGeometry>
+  </Application.Resources>
+
   <Application.Styles>
-    <FluentTheme />
+    <FluentTheme>
+      <FluentTheme.Palettes>
+        <ColorPaletteResources x:Key="Dark" Accent="#3CCFC4" RegionColor="#16191E" AltHigh="#0E1013"
+                               ChromeMediumLow="#1D2127" ChromeMedium="#232830" ChromeLow="#16191E"
+                               BaseHigh="#E8EAED" BaseMedium="#8B929C"/>
+      </FluentTheme.Palettes>
+    </FluentTheme>
+
+    <Style Selector="Window">
+      <Setter Property="FontSize" Value="13"/>
+      <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+    </Style>
+
+    <!-- cards -->
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="{StaticResource CardBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource StrokeBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="14"/>
+      <Setter Property="ClipToBounds" Value="True"/>
+    </Style>
+    <Style Selector="Border.chip">
+      <Setter Property="Background" Value="{StaticResource RaisedBrush}"/>
+      <Setter Property="CornerRadius" Value="999"/>
+      <Setter Property="Padding" Value="9,2"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Border.chip > TextBlock">
+      <Setter Property="FontSize" Value="11"/>
+      <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+    </Style>
+
+    <!-- text roles -->
+    <Style Selector="TextBlock.h1">
+      <Setter Property="FontSize" Value="26"/>
+      <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+    <Style Selector="TextBlock.h2">
+      <Setter Property="FontSize" Value="15"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+    <Style Selector="TextBlock.muted">
+      <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+    </Style>
+    <Style Selector="TextBlock.caption">
+      <Setter Property="FontSize" Value="11"/>
+      <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+    </Style>
+    <Style Selector="TextBlock.overline">
+      <Setter Property="FontSize" Value="11"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="LetterSpacing" Value="1.2"/>
+      <Setter Property="Foreground" Value="{StaticResource FaintBrush}"/>
+    </Style>
+
+    <!-- buttons -->
+    <Style Selector="Button">
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Padding" Value="14,8"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Background" Value="{StaticResource RaisedBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource StrokeBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource HoverBrush}"/>
+      <Setter Property="BorderBrush" Value="#343A44"/>
+    </Style>
+    <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Opacity" Value="0.4"/>
+    </Style>
+
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+      <Setter Property="Foreground" Value="{StaticResource OnAccentBrush}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource AccentHoverBrush}"/>
+      <Setter Property="Foreground" Value="{StaticResource OnAccentBrush}"/>
+    </Style>
+    <Style Selector="Button.primary:disabled /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+      <Setter Property="Foreground" Value="{StaticResource OnAccentBrush}"/>
+    </Style>
+
+    <Style Selector="Button.outline">
+      <Setter Property="Background" Value="#9916191E"/>
+      <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+      <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+    </Style>
+    <Style Selector="Button.outline:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource AccentSoftBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource AccentHoverBrush}"/>
+      <Setter Property="Foreground" Value="{StaticResource AccentHoverBrush}"/>
+    </Style>
+
+    <Style Selector="Button.ghost">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="10,6"/>
+      <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+    </Style>
+    <Style Selector="Button.ghost:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource HoverBrush}"/>
+      <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+    </Style>
+    <Style Selector="Button.ghost:disabled /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    <Style Selector="Button.icon">
+      <Setter Property="Width" Value="32"/>
+      <Setter Property="Height" Value="32"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Button.danger:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Foreground" Value="{StaticResource DangerBrush}"/>
+    </Style>
+    <Style Selector="PathIcon">
+      <Setter Property="Width" Value="16"/>
+      <Setter Property="Height" Value="16"/>
+    </Style>
+
+    <!-- pill tabs -->
+    <Style Selector="TabControl">
+      <Setter Property="Padding" Value="0"/>
+    </Style>
+    <Style Selector="TabItem">
+      <Setter Property="FontSize" Value="13"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="MinHeight" Value="30"/>
+      <Setter Property="Padding" Value="14,0"/>
+      <Setter Property="Margin" Value="0,0,4,0"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    <Style Selector="TabItem:pointerover /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="{StaticResource HoverBrush}"/>
+    </Style>
+    <Style Selector="TabItem:selected /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="{StaticResource RaisedBrush}"/>
+    </Style>
+    <Style Selector="TabItem:selected">
+      <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+    </Style>
+    <Style Selector="TabItem /template/ Border#PART_SelectedPipe, TabItem:selected /template/ Border#PART_SelectedPipe">
+      <Setter Property="IsVisible" Value="False"/>
+    </Style>
+
+    <!-- inputs -->
+    <Style Selector="TextBox">
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Background" Value="{StaticResource RaisedBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource StrokeBrush}"/>
+      <Setter Property="MinHeight" Value="34"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="ComboBox">
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="MinHeight" Value="34"/>
+      <Setter Property="Background" Value="#CC1D2127"/>
+      <Setter Property="BorderBrush" Value="{StaticResource StrokeBrush}"/>
+    </Style>
+
+    <!-- lists -->
+    <Style Selector="ListBox">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Padding" Value="6"/>
+    </Style>
+    <Style Selector="ListBox.rows > ListBoxItem">
+      <Setter Property="Padding" Value="10,8"/>
+      <Setter Property="Margin" Value="0,1"/>
+      <Setter Property="CornerRadius" Value="10"/>
+    </Style>
+    <Style Selector="ListBox.rows > ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource HoverBrush}"/>
+    </Style>
+    <Style Selector="ListBox.rows > ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource SelectedBrush}"/>
+    </Style>
+    <Style Selector="ListBox.rows > ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#21383A"/>
+    </Style>
+    <Style Selector="ListBox.plain > ListBoxItem">
+      <Setter Property="Padding" Value="8,3"/>
+      <Setter Property="MinHeight" Value="0"/>
+    </Style>
+
+    <Style Selector="ProgressBar">
+      <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+      <Setter Property="Background" Value="{StaticResource RaisedBrush}"/>
+    </Style>
+    <Style Selector="GridSplitter">
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
   </Application.Styles>
 </Application>

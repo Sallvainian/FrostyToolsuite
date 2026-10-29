@@ -97,27 +97,19 @@ public static class WineLauncher
         return true;
     }
 
-    public static void Launch(GameInstall inGame, bool inModded)
+    public static void Launch(GameInstall inGame)
     {
         if (inGame.SteamAppId is null)
         {
-            FrostyLogger.Logger?.LogError("Launching is only supported for Steam games so far, start the game yourself" +
-                                          (inModded ? $" with -dataPath \"{GameSession.DataPathArgument}\"." : "."));
+            FrostyLogger.Logger?.LogError("Launching is only supported for Steam games so far, start the game yourself.");
             return;
         }
 
+        // the mods are compiled into the game folder, so a plain launch picks them up
         ProcessStartInfo info = new("steam") { UseShellExecute = false };
         info.ArgumentList.Add("-applaunch");
         info.ArgumentList.Add(inGame.SteamAppId);
-        if (inModded)
-        {
-            info.ArgumentList.Add("-dataPath");
-            info.ArgumentList.Add(GameSession.DataPathArgument);
-        }
-
         Process.Start(info);
-        FrostyLogger.Logger?.LogInfo(inModded
-            ? "Launching modded through Steam. If Steam asks about launch arguments, allow them."
-            : "Launching without mods through Steam.");
+        FrostyLogger.Logger?.LogInfo($"Launching {inGame.DisplayName} through Steam");
     }
 }

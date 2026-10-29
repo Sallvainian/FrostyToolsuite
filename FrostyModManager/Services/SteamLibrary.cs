@@ -96,6 +96,32 @@ public static partial class SteamLibrary
         return new GameInstall(display, inExePath, null, null);
     }
 
+    /// <summary>
+    /// Finds a piece of the game's library artwork in Steam's cache (library_hero.jpg, logo.png, header.jpg…).
+    /// </summary>
+    public static string? FindArtwork(GameInstall inGame, string inFileName)
+    {
+        if (inGame.SteamAppId is null)
+        {
+            return null;
+        }
+
+        foreach (string library in GetLibraryPaths())
+        {
+            string cache = Path.Combine(library, "appcache", "librarycache", inGame.SteamAppId);
+            if (Directory.Exists(cache))
+            {
+                string? file = Directory.EnumerateFiles(cache, inFileName, SearchOption.AllDirectories).FirstOrDefault();
+                if (file is not null)
+                {
+                    return file;
+                }
+            }
+        }
+
+        return null;
+    }
+
     private static string? GetPrefix(string inLibrary, string inAppId)
     {
         string prefix = Path.Combine(inLibrary, "steamapps", "compatdata", inAppId, "pfx");

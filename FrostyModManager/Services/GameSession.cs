@@ -35,11 +35,6 @@ public sealed class GameSession
     public string ModsDirectory => Path.Combine(Utils.BaseDirectory, "Mods", ProfilesLibrary.InternalName);
     public string ModDataDirectory => Path.Combine(Game.Directory, "ModData", "Default");
 
-    /// <summary>
-    /// The -dataPath argument for the game, relative to the game directory.
-    /// </summary>
-    public const string DataPathArgument = "ModData\\Default";
-
     private string KeyPath => Path.Combine(Utils.BaseDirectory, "Keys", $"{ProfilesLibrary.InternalName}.initfs.key");
 
     public GameSession(GameInstall inGame)
@@ -52,6 +47,33 @@ public sealed class GameSession
     /// out of the running game.
     /// </summary>
     public SessionState Load()
+    {
+        // compiled mods live in the game folder, take them out while loading so the managers only ever see vanilla
+        InstallManifest? installed = GameInstaller.GetInstalled(Game);
+        if (installed is null)
+        {
+            return LoadVanilla();
+        }
+
+        GameInstaller.Uninstall(Game);
+        try
+        {
+            return LoadVanilla();
+        }
+        finally
+        {
+            if (Directory.Exists(ModDataDirectory))
+            {
+                GameInstaller.Install(Game, ModDataDirectory, installed.Pack, installed.Mods);
+            }
+            else
+            {
+                FrostyLogger.Logger?.LogWarning("The compiled mod data is gone, the game is vanilla now. Compile again to reinstall the mods.");
+            }
+        }
+    }
+
+    private SessionState LoadVanilla()
     {
         if (!ProfilesLibrary.Initialize(Game.ProfileName))
         {

@@ -4,112 +4,358 @@
         xmlns:models="using:FrostyModManager.Models"
         x:Class="FrostyModManager.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="Frosty Mod Manager"
-        Width="1100" Height="760" MinWidth="760" MinHeight="520"
+        Title="{Binding WindowTitle}"
+        Width="1440" Height="900" MinWidth="1000" MinHeight="620"
+        Background="{StaticResource BgBrush}"
         DragDrop.AllowDrop="True">
 
-  <Grid RowDefinitions="Auto,*,Auto,Auto,200" Margin="12">
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
 
-    <!-- game picker -->
-    <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,10">
-      <TextBlock Grid.Column="0" Text="Game" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold"/>
-      <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
-                ItemsSource="{Binding Games}" SelectedItem="{Binding SelectedGame}"
-                IsEnabled="{Binding !IsBusy}"/>
-      <Button Grid.Column="2" Content="Browse…" Margin="8,0,0,0" Click="OnBrowseGame" IsEnabled="{Binding !IsBusy}"/>
-    </Grid>
+    <!-- hero: game artwork, state and the main actions -->
+    <Panel Grid.Row="0" Height="200">
+      <Image Source="{Binding HeroImage}" Stretch="UniformToFill" Opacity="0.55"/>
+      <Border>
+        <Border.Background>
+          <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+            <GradientStop Color="#330E1013" Offset="0"/>
+            <GradientStop Color="#990E1013" Offset="0.6"/>
+            <GradientStop Color="{StaticResource BgColor}" Offset="1"/>
+          </LinearGradientBrush>
+        </Border.Background>
+      </Border>
+      <Border>
+        <Border.Background>
+          <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+            <GradientStop Color="#CC0E1013" Offset="0"/>
+            <GradientStop Color="#000E1013" Offset="0.55"/>
+          </LinearGradientBrush>
+        </Border.Background>
+      </Border>
 
-    <!-- mod list + details -->
-    <Grid Grid.Row="1" ColumnDefinitions="3*,Auto,2*">
-      <DockPanel Grid.Column="0">
-        <TextBlock DockPanel.Dock="Top" Margin="0,0,0,6" Opacity="0.7"
-                   Text="Mods higher in the list win when two mods change the same asset. Drop .fbmod / .fbcollection / .zip files here."
-                   TextWrapping="Wrap"/>
-        <Border BorderBrush="#40FFFFFF" BorderThickness="1" CornerRadius="4">
-          <Panel>
-            <ListBox x:Name="ModList" ItemsSource="{Binding Mods}" SelectedItem="{Binding SelectedMod}">
-              <ListBox.ItemTemplate>
-                <DataTemplate x:DataType="models:ModItem">
-                  <Grid ColumnDefinitions="Auto,*,Auto">
-                    <CheckBox Grid.Column="0" IsChecked="{Binding IsEnabled}" VerticalAlignment="Center"/>
-                    <StackPanel Grid.Column="1" Margin="4,0,0,0" VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
-                      <TextBlock Text="{Binding Byline}" FontSize="12" Opacity="0.65" TextTrimming="CharacterEllipsis"/>
-                    </StackPanel>
-                    <TextBlock Grid.Column="2" Text="{Binding Category}" FontSize="12" Opacity="0.5"
-                               VerticalAlignment="Center" Margin="8,0,4,0"/>
-                  </Grid>
-                </DataTemplate>
-              </ListBox.ItemTemplate>
-            </ListBox>
-            <TextBlock Text="No mods yet. Click “Add mods…” or drop files onto the window."
-                       HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.5"
-                       IsVisible="{Binding !Mods.Count}"/>
-          </Panel>
-        </Border>
-      </DockPanel>
+      <Grid Margin="28,18,28,18" RowDefinitions="Auto,*" ColumnDefinitions="*,Auto">
+        <!-- top right: game picker + overflow -->
+        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+          <ComboBox MinWidth="190" ItemsSource="{Binding Games}" SelectedItem="{Binding SelectedGame}"
+                    IsEnabled="{Binding !IsBusy}"/>
+          <Button Classes="ghost icon" ToolTip.Tip="More">
+            <PathIcon Data="{StaticResource IconMore}"/>
+            <Button.Flyout>
+              <MenuFlyout Placement="BottomEdgeAlignedRight">
+                <MenuItem Header="Add mods…" Click="OnAddMods" IsEnabled="{Binding IsReady}"/>
+                <MenuItem Header="Open mods folder" Command="{Binding OpenModsFolderCommand}"/>
+                <MenuItem Header="Open game folder" Command="{Binding OpenGameFolderCommand}"/>
+                <Separator/>
+                <MenuItem Header="Select game executable…" Click="OnBrowseGame" IsEnabled="{Binding !IsBusy}"/>
+                <MenuItem Header="Set up from running game" Command="{Binding SetupCommand}"/>
+                <MenuItem Header="Restore vanilla files" Command="{Binding RestoreVanillaCommand}"/>
+                <Separator/>
+                <MenuItem Header="About" Click="OnAbout"/>
+              </MenuFlyout>
+            </Button.Flyout>
+          </Button>
+        </StackPanel>
 
-      <StackPanel Grid.Column="1" Margin="8,22,8,0" Spacing="6" Width="110">
-        <Button HorizontalAlignment="Stretch" Content="Add mods…" Click="OnAddMods" IsEnabled="{Binding IsReady}"/>
-        <Button HorizontalAlignment="Stretch" Content="Remove" Command="{Binding RemoveModCommand}"/>
-        <Separator Margin="0,4"/>
-        <Button HorizontalAlignment="Stretch" Content="Move up" Command="{Binding MoveUpCommand}"/>
-        <Button HorizontalAlignment="Stretch" Content="Move down" Command="{Binding MoveDownCommand}"/>
-      </StackPanel>
+        <!-- bottom left: logo/title, state, pack -->
+        <StackPanel Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" Spacing="12">
+          <Image Source="{Binding LogoImage}" Height="120" Margin="-18,0,0,-18" HorizontalAlignment="Left" IsVisible="{Binding HasLogo}"/>
+          <TextBlock Classes="h1" Text="{Binding GameTitle}" IsVisible="{Binding !HasLogo}"/>
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Border Classes="chip" Background="#CC1D2127" Padding="10,5">
+              <StackPanel Orientation="Horizontal" Spacing="7">
+                <Ellipse Width="8" Height="8" Fill="{StaticResource AccentBrush}" IsVisible="{Binding IsModded}"/>
+                <Ellipse Width="8" Height="8" Fill="{StaticResource FaintBrush}" IsVisible="{Binding !IsModded}"/>
+                <TextBlock Text="{Binding InstalledStatus}" FontSize="12" Foreground="{StaticResource TextBrush}"/>
+              </StackPanel>
+            </Border>
+            <TextBlock Text="Pack" Classes="muted" VerticalAlignment="Center" Margin="6,0,0,0"/>
+            <ComboBox MinWidth="160" ItemsSource="{Binding Packs}" SelectedItem="{Binding SelectedPack}"
+                      IsEnabled="{Binding IsReady}"/>
+            <Button Classes="ghost icon" ToolTip.Tip="New pack" Command="{Binding AddPackCommand}">
+              <PathIcon Data="{StaticResource IconPlus}"/>
+            </Button>
+            <Button Classes="ghost icon danger" ToolTip.Tip="Delete pack" Command="{Binding RemovePackCommand}">
+              <PathIcon Data="{StaticResource IconTrash}"/>
+            </Button>
+          </StackPanel>
+        </StackPanel>
 
-      <Border Grid.Column="2" Margin="0,22,0,0" BorderBrush="#40FFFFFF" BorderThickness="1" CornerRadius="4" Padding="12">
-        <Panel>
-          <ScrollViewer IsVisible="{Binding SelectedMod, Converter={x:Static ObjectConverters.IsNotNull}}">
-            <StackPanel Spacing="6">
-              <TextBlock Text="{Binding SelectedMod.Title, FallbackValue=''}" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap"/>
-              <TextBlock Text="{Binding SelectedMod.Byline, FallbackValue=''}" Opacity="0.7"/>
-              <TextBlock Text="{Binding SelectedMod.FileName, FallbackValue=''}" Opacity="0.5" FontSize="12" TextWrapping="Wrap"/>
-              <SelectableTextBlock Text="{Binding SelectedMod.ModPageLink, FallbackValue=''}" Opacity="0.7" FontSize="12" TextWrapping="Wrap"/>
-              <TextBlock Text="{Binding SelectedMod.Description, FallbackValue=''}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+        <!-- bottom right: actions -->
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Bottom">
+          <Button Command="{Binding RestoreVanillaCommand}" ToolTip.Tip="Put the original game files back">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <PathIcon Data="{StaticResource IconRestore}"/>
+              <TextBlock Text="Restore vanilla"/>
             </StackPanel>
-          </ScrollViewer>
-          <TextBlock Text="Select a mod to see its details." Opacity="0.5"
-                     HorizontalAlignment="Center" VerticalAlignment="Center"
-                     IsVisible="{Binding SelectedMod, Converter={x:Static ObjectConverters.IsNull}}"/>
-        </Panel>
+          </Button>
+          <Button Classes="outline" Command="{Binding CompileCommand}"
+                  ToolTip.Tip="Build the applied mods and install them into the game (originals are backed up)">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <PathIcon Data="{StaticResource IconBolt}"/>
+              <TextBlock Text="Compile"/>
+            </StackPanel>
+          </Button>
+          <Button Classes="primary" Padding="26,10" FontSize="15" Command="{Binding LaunchCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <PathIcon Data="{StaticResource IconPlay}" Width="18" Height="18"/>
+              <TextBlock Text="Launch"/>
+            </StackPanel>
+          </Button>
+        </StackPanel>
+      </Grid>
+    </Panel>
+
+    <!-- first-time setup banner -->
+    <Border Grid.Row="1" Margin="20,0,20,12" Padding="16,12" CornerRadius="12" Background="{StaticResource AccentSoftBrush}"
+            BorderBrush="#2D5B5A" BorderThickness="1" IsVisible="{Binding NeedsSetup}">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="2" VerticalAlignment="Center">
+          <TextBlock Classes="h2" Text="One-time setup"/>
+          <TextBlock Classes="muted" TextWrapping="Wrap"
+                     Text="Start the game and wait for its main menu. The mod manager then reads the encryption key and type info straight from the running game."/>
+        </StackPanel>
+        <Button Grid.Column="1" Classes="primary" Command="{Binding SetupCommand}" Content="Set up now" Margin="16,0,0,0"/>
+      </Grid>
+    </Border>
+
+    <!-- library and load order -->
+    <Grid Grid.Row="2" Margin="20,0,20,0" ColumnDefinitions="1.15*,16,*">
+
+      <!-- library -->
+      <Border Grid.Column="0" Classes="card">
+        <TabControl Margin="12" SelectedIndex="{Binding LibraryTab}">
+          <TabItem Header="{Binding AvailableHeader}">
+            <DockPanel Margin="0,12,0,0">
+              <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,8">
+                <TextBox Grid.Column="0" Watermark="Search mods" Text="{Binding FilterText}">
+                  <TextBox.InnerLeftContent>
+                    <PathIcon Data="{StaticResource IconSearch}" Margin="10,0,2,0" Foreground="{StaticResource FaintBrush}"/>
+                  </TextBox.InnerLeftContent>
+                  <TextBox.InnerRightContent>
+                    <Button Classes="ghost icon" Width="26" Height="26" Margin="0,0,4,0" Command="{Binding ClearFilterCommand}"
+                            IsVisible="{Binding FilterText.Length}">
+                      <PathIcon Data="{StaticResource IconClose}" Width="12" Height="12"/>
+                    </Button>
+                  </TextBox.InnerRightContent>
+                </TextBox>
+                <Button Grid.Column="1" Classes="ghost icon danger" Margin="8,0,0,0" ToolTip.Tip="Delete selected mods"
+                        Click="OnRemoveMods" IsEnabled="{Binding IsReady}">
+                  <PathIcon Data="{StaticResource IconTrash}"/>
+                </Button>
+                <Button Grid.Column="2" Classes="primary" Margin="8,0,0,0" Click="OnAddMods" IsEnabled="{Binding IsReady}">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <PathIcon Data="{StaticResource IconPlus}"/>
+                    <TextBlock Text="Add mods"/>
+                  </StackPanel>
+                </Button>
+              </Grid>
+
+              <Panel>
+                <ListBox x:Name="LibraryList" Classes="rows" ItemsSource="{Binding LibraryRows}" SelectionMode="Multiple"
+                         SelectionChanged="OnLibrarySelectionChanged" DoubleTapped="OnLibraryDoubleTapped">
+                  <ListBox.DataTemplates>
+                    <DataTemplate DataType="models:CategoryHeader">
+                      <TextBlock Classes="overline" Text="{Binding Label}" Margin="2,10,0,0"/>
+                    </DataTemplate>
+                    <DataTemplate DataType="models:ModItem">
+                      <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                        <Border Width="44" Height="44" CornerRadius="10" ClipToBounds="True" Background="{StaticResource RaisedBrush}">
+                          <Panel>
+                            <PathIcon Data="{StaticResource IconPackage}" Width="20" Height="20"
+                                      Foreground="{StaticResource FaintBrush}" IsVisible="{Binding !HasIcon}"/>
+                            <Image Source="{Binding Icon}" Stretch="UniformToFill"/>
+                          </Panel>
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="12,0" VerticalAlignment="Center" Spacing="2">
+                          <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                          <TextBlock Classes="caption" Text="{Binding Byline}" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                        <Border Grid.Column="2" Classes="chip" IsVisible="{Binding HasVersion}" Margin="0,0,10,0">
+                          <TextBlock Text="{Binding VersionLabel}"/>
+                        </Border>
+                        <Panel Grid.Column="3" Width="32" Height="32">
+                          <Border Width="26" Height="26" CornerRadius="13" Background="{StaticResource AccentSoftBrush}"
+                                  IsVisible="{Binding IsApplied}" ToolTip.Tip="In the load order">
+                            <PathIcon Data="{StaticResource IconCheck}" Width="14" Height="14" Foreground="{StaticResource AccentBrush}"/>
+                          </Border>
+                          <Button Classes="ghost icon" IsVisible="{Binding !IsApplied}" ToolTip.Tip="Add to load order"
+                                  Command="{Binding $parent[ListBox].((vm:MainWindowViewModel)DataContext).ApplyOneCommand}"
+                                  CommandParameter="{Binding}">
+                            <PathIcon Data="{StaticResource IconPlus}"/>
+                          </Button>
+                        </Panel>
+                      </Grid>
+                    </DataTemplate>
+                  </ListBox.DataTemplates>
+                </ListBox>
+
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10"
+                            IsVisible="{Binding !AvailableMods.Count}">
+                  <Border Width="72" Height="72" CornerRadius="36" Background="{StaticResource RaisedBrush}" HorizontalAlignment="Center">
+                    <PathIcon Data="{StaticResource IconPackage}" Width="30" Height="30" Foreground="{StaticResource AccentBrush}"/>
+                  </Border>
+                  <TextBlock Classes="h2" Text="Your mod library is empty" HorizontalAlignment="Center"/>
+                  <TextBlock Classes="muted" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="340"
+                             Text="Add .fbmod, .fbcollection or .zip files, or drop them anywhere on this window. Frosty 1.x mods are converted automatically."/>
+                </StackPanel>
+              </Panel>
+            </DockPanel>
+          </TabItem>
+
+          <TabItem Header="Log">
+            <DockPanel Margin="0,12,0,0">
+              <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,6">
+                <TextBlock Classes="caption" VerticalAlignment="Center" Text="Everything the SDK reports while loading, compiling and restoring."/>
+                <Button Grid.Column="1" Classes="ghost" Content="Clear" Command="{Binding ClearLogCommand}"/>
+              </Grid>
+              <Border CornerRadius="10" Background="#0B0D10" BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
+                <ListBox x:Name="LogList" Classes="plain" ItemsSource="{Binding Log}">
+                  <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="models:LogLine">
+                      <SelectableTextBlock Text="{Binding Text}" Foreground="{Binding Brush}" FontFamily="monospace"
+                                           FontSize="12" TextWrapping="Wrap"/>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+              </Border>
+            </DockPanel>
+          </TabItem>
+        </TabControl>
+      </Border>
+
+      <!-- load order + details -->
+      <Border Grid.Column="2" Classes="card">
+        <TabControl Margin="12" SelectedIndex="{Binding DetailsTab}">
+          <TabItem Header="{Binding AppliedHeader}">
+            <DockPanel Margin="0,12,0,0">
+              <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,Auto,Auto,*,Auto" Margin="0,0,0,8">
+                <Button Grid.Column="0" Classes="ghost icon" ToolTip.Tip="Move up" Command="{Binding MoveAppliedUpCommand}">
+                  <PathIcon Data="{StaticResource IconUp}"/>
+                </Button>
+                <Button Grid.Column="1" Classes="ghost icon" ToolTip.Tip="Move down (loads later, wins conflicts)" Command="{Binding MoveAppliedDownCommand}">
+                  <PathIcon Data="{StaticResource IconDown}"/>
+                </Button>
+                <Button Grid.Column="2" Classes="ghost icon danger" ToolTip.Tip="Remove from load order" Command="{Binding RemoveAppliedCommand}">
+                  <PathIcon Data="{StaticResource IconClose}"/>
+                </Button>
+                <Button Grid.Column="4" Classes="ghost" Content="Clear all" Command="{Binding ClearAppliedCommand}"/>
+              </Grid>
+              <TextBlock DockPanel.Dock="Bottom" Classes="caption" Margin="4,8,4,0" TextWrapping="Wrap"
+                         Text="When two mods change the same file, the one lower in the list wins. Compile after changing the order."/>
+              <Panel>
+                <ListBox Classes="rows" ItemsSource="{Binding AppliedMods}" SelectedItem="{Binding SelectedApplied}">
+                  <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="models:AppliedMod">
+                      <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+                        <Border Width="24" Height="24" CornerRadius="12" Background="{StaticResource RaisedBrush}" VerticalAlignment="Center">
+                          <TextBlock Text="{Binding Order}" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center"
+                                     VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"/>
+                        </Border>
+                        <Border Grid.Column="1" Width="34" Height="34" CornerRadius="8" ClipToBounds="True" Margin="10,0,0,0"
+                                Background="{StaticResource RaisedBrush}">
+                          <Panel>
+                            <PathIcon Data="{StaticResource IconPackage}" Width="16" Height="16"
+                                      Foreground="{StaticResource FaintBrush}" IsVisible="{Binding !Mod.HasIcon}"/>
+                            <Image Source="{Binding Mod.Icon}" Stretch="UniformToFill"/>
+                          </Panel>
+                        </Border>
+                        <StackPanel Grid.Column="2" Margin="12,0" VerticalAlignment="Center" Spacing="1">
+                          <TextBlock Text="{Binding Mod.Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                          <TextBlock Classes="caption" Text="{Binding Mod.Category}"/>
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="3" IsChecked="{Binding IsEnabled}" OnContent="" OffContent=""
+                                      MinWidth="0" VerticalAlignment="Center" ToolTip.Tip="Include in the next compile"/>
+                      </Grid>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6"
+                            IsVisible="{Binding !AppliedMods.Count}">
+                  <TextBlock Classes="h2" Text="Nothing applied yet" HorizontalAlignment="Center"/>
+                  <TextBlock Classes="muted" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="300"
+                             Text="Click + on a mod in your library (or double-click it) to add it to this pack."/>
+                </StackPanel>
+              </Panel>
+            </DockPanel>
+          </TabItem>
+
+          <TabItem Header="Details">
+            <Panel Margin="0,12,0,0">
+              <ScrollViewer IsVisible="{Binding DescribedMod, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <StackPanel Spacing="16" Margin="4,0,8,8">
+                  <Grid ColumnDefinitions="Auto,*">
+                    <Border Width="76" Height="76" CornerRadius="16" ClipToBounds="True" Background="{StaticResource RaisedBrush}">
+                      <Panel>
+                        <PathIcon Data="{StaticResource IconPackage}" Width="30" Height="30" Foreground="{StaticResource FaintBrush}"
+                                  IsVisible="{Binding !DescribedMod.HasIcon, FallbackValue=True}"/>
+                        <Image Source="{Binding DescribedMod.Icon, FallbackValue={x:Null}}" Stretch="UniformToFill"/>
+                      </Panel>
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center" Spacing="4">
+                      <TextBlock Text="{Binding DescribedMod.Title, FallbackValue=''}" FontSize="22" FontWeight="Bold" TextWrapping="Wrap"/>
+                      <TextBlock Classes="muted" Text="{Binding DescribedMod.Byline, FallbackValue=''}"/>
+                      <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
+                        <Border Classes="chip" IsVisible="{Binding DescribedMod.HasVersion, FallbackValue=False}">
+                          <TextBlock Text="{Binding DescribedMod.VersionLabel, FallbackValue=''}"/>
+                        </Border>
+                        <Border Classes="chip"><TextBlock Text="{Binding DescribedMod.Category, FallbackValue=''}"/></Border>
+                        <Border Classes="chip"><TextBlock Text="{Binding DescribedMod.AffectedSummary, FallbackValue=''}"/></Border>
+                      </StackPanel>
+                    </StackPanel>
+                  </Grid>
+
+                  <SelectableTextBlock Text="{Binding DescribedMod.Description, FallbackValue=''}" TextWrapping="Wrap" LineHeight="20"/>
+                  <SelectableTextBlock Text="{Binding DescribedMod.ModPageLink, FallbackValue=''}" FontSize="12"
+                                       Foreground="{StaticResource AccentBrush}" TextWrapping="Wrap"/>
+
+                  <ItemsControl ItemsSource="{Binding DescribedMod.Screenshots, FallbackValue={x:Null}}"
+                                IsVisible="{Binding DescribedMod.HasScreenshots, FallbackValue=False}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <Border CornerRadius="10" ClipToBounds="True" Margin="0,0,10,10">
+                          <Image Source="{Binding}" Height="120" Stretch="Uniform"/>
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+
+                  <TextBlock Classes="overline" Text="AFFECTED FILES"/>
+                  <ItemsControl ItemsSource="{Binding DescribedMod.AffectedFiles, FallbackValue={x:Null}}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="models:AffectedFile">
+                        <Grid ColumnDefinitions="Auto,*" Margin="0,3">
+                          <Border Background="{Binding Brush}" CornerRadius="5" Padding="6,1" MinWidth="40" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Kind}" Foreground="#0E1013" FontSize="10" FontWeight="Bold"
+                                       HorizontalAlignment="Center"/>
+                          </Border>
+                          <TextBlock Grid.Column="1" Text="{Binding Name}" FontFamily="monospace" FontSize="12" Margin="10,0,0,0"
+                                     Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </ScrollViewer>
+              <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6"
+                          IsVisible="{Binding DescribedMod, Converter={x:Static ObjectConverters.IsNull}}">
+                <TextBlock Classes="h2" Text="No mod selected" HorizontalAlignment="Center"/>
+                <TextBlock Classes="muted" Text="Pick a mod to see its description and the files it changes."/>
+              </StackPanel>
+            </Panel>
+          </TabItem>
+        </TabControl>
       </Border>
     </Grid>
 
-    <!-- actions -->
-    <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" Margin="0,12,0,8">
-      <Button Grid.Column="0" Content="Set up from running game" Command="{Binding SetupCommand}"
-              IsVisible="{Binding NeedsSetup}" Classes="accent"/>
-      <TextBlock Grid.Column="1" Text="{Binding Status}" VerticalAlignment="Center" Margin="12,0" TextWrapping="Wrap"/>
-      <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-        <Button Content="Apply" Command="{Binding ApplyCommand}"/>
-        <Button Content="Launch vanilla" Command="{Binding LaunchVanillaCommand}"/>
-        <Button Content="Launch modded" Command="{Binding LaunchModdedCommand}" Classes="accent"/>
-      </StackPanel>
+    <!-- status bar -->
+    <Grid Grid.Row="3" Margin="24,10,24,12" ColumnDefinitions="Auto,*,Auto">
+      <TextBlock Classes="caption" Text="{Binding AvailableFooter}" VerticalAlignment="Center"/>
+      <TextBlock Grid.Column="1" Classes="caption" Text="{Binding Status}" Margin="20,0" VerticalAlignment="Center"
+                 TextTrimming="CharacterEllipsis"/>
+      <ProgressBar Grid.Column="2" Width="180" MinWidth="0" Height="4" MinHeight="0" CornerRadius="2"
+                   VerticalAlignment="Center" IsIndeterminate="True" IsVisible="{Binding IsBusy}"/>
     </Grid>
-
-    <ProgressBar Grid.Row="3" IsIndeterminate="{Binding IsBusy}" Height="4" MinHeight="4" Margin="0,0,0,6"/>
-
-    <!-- log -->
-    <Border Grid.Row="4" BorderBrush="#40FFFFFF" BorderThickness="1" CornerRadius="4" Background="#18000000">
-      <Grid RowDefinitions="Auto,*">
-        <Grid ColumnDefinitions="*,Auto" Margin="8,4,4,0">
-          <TextBlock Text="Log" FontWeight="SemiBold" VerticalAlignment="Center"/>
-          <Button Grid.Column="1" Content="Clear" Command="{Binding ClearLogCommand}" Padding="8,2" FontSize="12"/>
-        </Grid>
-        <ListBox x:Name="LogList" Grid.Row="1" ItemsSource="{Binding Log}" Background="Transparent">
-          <ListBox.Styles>
-            <Style Selector="ListBoxItem">
-              <Setter Property="Padding" Value="8,1"/>
-              <Setter Property="MinHeight" Value="0"/>
-            </Style>
-          </ListBox.Styles>
-          <ListBox.ItemTemplate>
-            <DataTemplate x:DataType="models:LogLine">
-              <SelectableTextBlock Text="{Binding Text}" Foreground="{Binding Brush}" FontFamily="monospace" FontSize="12" TextWrapping="Wrap"/>
-            </DataTemplate>
-          </ListBox.ItemTemplate>
-        </ListBox>
-      </Grid>
-    </Border>
   </Grid>
 </Window>

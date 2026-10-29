@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using FrostyModManager.Models;
 using FrostyModManager.ViewModels;
 
 namespace FrostyModManager.Views;
@@ -34,29 +35,60 @@ public partial class MainWindow : Window
     protected override void OnDataContextChanged(EventArgs e)
     {
         base.OnDataContextChanged(e);
-        if (DataContext is MainWindowViewModel vm)
+        if (DataContext is not MainWindowViewModel vm)
         {
-            // keep the newest log line in view
-            vm.Log.CollectionChanged += (_, args) =>
-            {
-                if (args.Action == NotifyCollectionChangedAction.Add && vm.Log.Count > 0)
-                {
-                    LogList.ScrollIntoView(vm.Log.Count - 1);
-                }
-            };
+            return;
         }
+
+        vm.ConfirmAsync = (title, message) => Dialogs.ConfirmAsync(this, title, message);
+        vm.PromptAsync = (title, label) => Dialogs.PromptAsync(this, title, label);
+
+        // keep the newest log line in view
+        vm.Log.CollectionChanged += (_, args) =>
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add && vm.Log.Count > 0)
+            {
+                LogList.ScrollIntoView(vm.Log.Count - 1);
+            }
+        };
     }
+
+    private List<ModItem> SelectedAvailable() => LibraryList.SelectedItems?.OfType<ModItem>().ToList() ?? new List<ModItem>();
 
     private async void OnAddMods(object? sender, RoutedEventArgs e)
     {
         IReadOnlyList<IStorageFile> files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "Add mods",
+            Title = "Add Mod(s)",
             AllowMultiple = true,
             FileTypeFilter = new[] { s_modFiles, FilePickerFileTypes.All }
         });
 
         await ViewModel.ImportAsync(files.Select(f => f.TryGetLocalPath()).OfType<string>());
+    }
+
+    private async void OnRemoveMods(object? sender, RoutedEventArgs e) => await ViewModel.RemoveModsAsync(SelectedAvailable());
+
+    private void OnLibraryDoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (LibraryList.SelectedItem is ModItem mod)
+        {
+            ViewModel.ApplyOneCommand.Execute(mod);
+        }
+    }
+
+    private void OnLibrarySelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        // category rows are labels, never selections
+        foreach (CategoryHeader header in e.AddedItems.OfType<CategoryHeader>())
+        {
+            LibraryList.SelectedItems?.Remove(header);
+        }
+
+        if (e.AddedItems.OfType<ModItem>().LastOrDefault() is { } mod)
+        {
+            ViewModel.DescribedMod = mod;
+        }
     }
 
     private async void OnBrowseGame(object? sender, RoutedEventArgs e)
@@ -73,6 +105,15 @@ public partial class MainWindow : Window
             ViewModel.AddGame(path);
         }
     }
+
+    private async void OnAbout(object? sender, RoutedEventArgs e)
+    {
+        await Dialogs.ConfirmAsync(this, "About",
+            "Frosty Mod Manager 2.0 for Linux\n\nA native mod manager built on the FrostyToolsuite v2 rewrite.\n" +
+            "github.com/Sallvainian/FrostyToolsuite (branch linux-native)");
+    }
+
+    private void OnExit(object? sender, RoutedEventArgs e) => Close();
 
     private void OnDragOver(object? sender, DragEventArgs e)
     {
