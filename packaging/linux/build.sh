@@ -77,5 +77,10 @@ for packager in deb rpm archlinux; do
     "$TOOLS/nfpm" package -f "$WORK/nfpm.yaml" -p "$packager" -t "$DIST/"
 done
 
+# GitHub turns the ~ that deb/rpm use for prereleases into a . when uploading, name them that way up front
+for file in "$DIST"/*~*; do
+    [[ -e "$file" ]] && mv "$file" "${file//\~/.}"
+done
+
 (cd "$DIST" && sha256sum -- * > SHA256SUMS)
 ls -lh "$DIST"
