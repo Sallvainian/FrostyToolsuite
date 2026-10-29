@@ -1,78 +1,127 @@
 <img align="center" src="Resources/FrostyBannerChucky296.svg">
 
 <p align="center">
-  <a title="Discord Server" href="https://discord.gg/sB8ZUAT">
-    <img alt="Discord Server" src="https://img.shields.io/discord/333086156478480384?color=green&label=DISCORD&logo=discord&logoColor=white">
+  <a title="Latest release" href="https://github.com/Sallvainian/FrostyToolsuite/releases">
+    <img alt="Latest release" src="https://img.shields.io/github/v/release/Sallvainian/FrostyToolsuite?include_prereleases&label=RELEASE&color=3CCFC4&logo=linux&logoColor=white">
   </a>
-  <a title="Total Downloads" href="https://github.com/CadeEvs/FrostyToolsuite/releases/latest">
-    <img alt="Total Downloads" src="https://img.shields.io/github/downloads/CadeEvs/FrostyToolsuite/latest/total?color=white&label=DOWNLOADS&logo=github">
+  <a title="License" href="LICENSE">
+    <img alt="License" src="https://img.shields.io/badge/LICENSE-GPL--3.0-white">
   </a>
 </p>
 
 > [!WARNING]
-> This Project is in development and doesn't have a release yet.
-> 
-> **Use at your own risk.**
-> 
-> For a stable release use [FrostyToolsuite v1.0.6.3](https://github.com/CadeEvs/FrostyToolsuite/releases/latest).
+> This is an **alpha** build of a fork of the in-development FrostyToolsuite v2 rewrite. It has been tested with
+> **Dead Space (2023)** on Steam with Proton. Other Frostbite games have profiles but are untested here.
+>
+> **Use at your own risk**, and use *Restore vanilla* before Steam updates or verifies a modded game.
 
-# About
-The FrostyToolsuite is a modding tool for games running on DICE's Frostbite game engine.
+# Frosty Mod Manager for Linux
+A native Linux mod manager for Frostbite games, built on the [FrostyToolsuite](https://github.com/FrostyToolsuite/FrostyToolsuite)
+.NET 8 rewrite. No Wine-hosted Windows tools are needed: the manager and the `frosty` command line tool run natively.
+Only the game itself runs under Proton.
 
-This is a rewrite of the FrostyToolsuite in .NET 8, which is in early development and has no functional UI yet.
+Frosty 1.x's mod manager only runs on Windows, and the Dead Space builds of it are Windows-only forks. This fork adds
+what Linux needs to mod those games:
 
-The old repository can be found at https://github.com/CadeEvs/FrostyToolsuite.
+- **A native GUI** ([FrostyModManager](FrostyModManager/README.md)) in Avalonia with a dark, Frosty-style workflow:
+  mod library, packs, load order, mod details and screenshots, and a log.
+- **Steam detection.** Steam installs that match a Frosty profile show up automatically, with their Steam artwork. Any
+  other install can be added by picking its `.exe`.
+- **One-time setup from the running game.** Games like Dead Space need an initfs key and a type SDK. Both are read out
+  of the running game's memory, so no key has to be pasted in from somewhere.
+- **Imports most Nexus downloads as-is.** `.fbmod`, `.fbcollection`, `.zip`, `.rar` and `.7z` all work. Frosty 1.x mods
+  are converted to the v2 format on import.
+- **Compile into the game folder.** Dead Space ignores `-dataPath`, so *Compile* builds the modded data, moves the
+  originals into `<game>/FrostyBackup` and links the modded files in their place. It also sets up the Proton DLL
+  override the game needs. *Restore vanilla* puts everything back.
+- **Launch through Steam** with one click. The manager reminds you to compile if the load order changed.
+- **SDK fixes for Linux:**
+  - Oodle is fetched for games that link it statically (Dead Space has no `oo2core` DLL).
+  - Writable data lives in `~/.local/share/frosty` instead of next to the executable.
 
-The goal of this rewrite is to clean up the code base and make it crossplatform with the use of [Avalonia UI](https://github.com/AvaloniaUI/Avalonia) and the [MVVM Community Toolkit](https://aka.ms/mvvmtoolkit/docs) instead of WPF.
+## Install
+Download a build from the [releases page](https://github.com/Sallvainian/FrostyToolsuite/releases). Every format
+contains both the mod manager (`frosty-mod-manager`) and the CLI (`frosty`). All are self-contained x86_64 builds, so
+no .NET install is needed.
 
-## Structure
-The Toolsuite is split up into multiple projects.
+| Format | Use it on | How |
+|---|---|---|
+| `.AppImage` | Any distro, including immutable ones (Bazzite, SteamOS, Fedora Atomic) | `chmod +x` it and run it. `<appimage> cli --help` runs the CLI. |
+| `.tar.xz` / `.tar.gz` | Any distro, without root | Extract, then run `./install.sh`. It adds an app-menu entry and `~/.local/bin` commands. `--uninstall` removes them. |
+| `.deb` | Debian, Ubuntu, Mint, Pop!_OS | `sudo apt install ./frosty-mod-manager_*.deb` |
+| `.rpm` | Fedora, openSUSE | `sudo dnf install ./frosty-mod-manager-*.rpm` |
+| `.pkg.tar.zst` | Arch, Manjaro, EndeavourOS, CachyOS | `sudo pacman -U frosty-mod-manager-*.pkg.tar.zst` |
 
-### FrostyEditor
-A GUI application which is used to create mods.
+Keys, SDKs, caches, mods and settings are stored in `~/.local/share/frosty` (`$XDG_DATA_HOME/frosty`) whichever format
+you install, so switching formats keeps everything. Set `FROSTY_DATA_DIR` to use another folder.
 
-### FrostyModManager
-A GUI application which is used to select what mods to apply to the game.
+## Quick start (Dead Space)
+1. Open **Frosty Mod Manager**. Dead Space is picked up from your Steam library.
+2. **First time only:** start the game, wait for the main menu, then click **Set up now** in the manager. Once the
+   setup banner is gone, you can quit the game.
+3. Click **Add mods**, or drag downloads from Nexus onto the window.
+4. Click **+** on a mod to add it to the load order. When two mods change the same file, the one lower in the list wins.
+5. With the game closed, click **Compile**, then **Launch**.
 
-### FrostyCLI
-A CLI application which is used to create, update and apply mods. 
-See [Readme](FrostyCli/README.md).
+Turn a mod's switch off and compile again to remove it from the game. **Restore vanilla** removes every mod. See the
+[FrostyModManager README](FrostyModManager/README.md) for details.
 
-### FrostySdk
-A library which is used to access data from the game.
-
-### FrostyModSupport
-A library which is used to create modified data which the game can read.
-
-### FrostyTypeSdkGenerator
-A source generator which is used to improve the type sdk which gets dumped from the games memory.
-
-# Getting Started
-
-## Release
-Download the latest release from [releases](https://github.com/FrostyToolsuite/FrostyToolsuite/releases/latest).
-
-## From source (For developer)
-Make sure you have [Git](https://git-scm.com/downloads) and the [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) installed and in your path.
-
-Then just clone and build the Editor using these commands.
+## Command line
+The `frosty` CLI ([README](FrostyCli/README.md)) can load games, build `ModData` folders, update old mods and create
+mods. This fork adds `find-initfs-key`, which recovers a game's initfs key from the running process:
+```bash
+frosty find-initfs-key "$HOME/.local/share/Steam/steamapps/common/Dead Space (2023)/Dead Space.exe"
 ```
-git clone https://github.com/FrostyToolsuite/FrostyToolsuite.git
+
+## Known limitations
+- x86_64 Linux only. Launching and auto-detection go through Steam.
+- Games that need bundle or CAS keys are not handled by the GUI yet. Use the CLI for those.
+- The game must be closed to compile or restore. The manager will not load a game that is running with compiled mods.
+
+# Building from source
+You need [Git](https://git-scm.com/downloads) and the [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+(newer SDKs also build it).
+```bash
+git clone https://github.com/Sallvainian/FrostyToolsuite.git
 cd FrostyToolsuite
 dotnet build
 ```
-After that the executable for the editor can be found in `FrostyToolsuite/FrostyEditor/bin/Debug/net8.0`, for the ModManager in `FrostyToolsuite/FrostyModManager/bin/Debug/net8.0`.
 
-*This is just a example, you can use any way you want to clone this repo*
+To build the same packages as a release, run the packaging script. The output goes to `packaging/linux/dist`:
+```bash
+packaging/linux/build.sh 2.0.0
+```
+Pushing a `v*` tag runs the same script on GitHub Actions and publishes a release. Tags with a `-` suffix, like
+`v2.0.0-alpha.1`, are published as prereleases.
 
-# Documentation
-Todo
+# Project structure
 
-# Plugins
-Todo
+### FrostyModManager
+The GUI used to pick which mods to apply to the game. In this fork it is the native Linux mod manager described above.
 
-# Contributing
-If you want to contribute to Frosty you can just fork this branch and make a pull request with your changes.
-Before you do that please check the [CodingStandards.cs](https://github.com/FrostyToolsuite/FrostyToolsuite/blob/master/CodingStandards.cs) to check if your code follows those.
-In the [Projects tab](https://github.com/orgs/FrostyToolsuite/projects/1) you can see what needs to be done, ideas of what can be done and stuff that is currently getting worked on or is already done.
-If you decide to work on something it would be great if you could say that in the #developer channel on our [Discord server](https://discord.gg/sB8ZUAT). Make sure to read the #read-me channel after join it
+### FrostyCli
+A CLI used to create, update and apply mods. See its [README](FrostyCli/README.md).
+
+### FrostySdk
+A library for reading the game's data.
+
+### FrostyModSupport
+A library that builds modified data the game can read.
+
+### FrostyTypeSdkGenerator
+A source generator that improves the type SDK dumped from the game's memory.
+
+### FrostyEditor
+The GUI for creating mods. It is still early in upstream development and is not part of the Linux packages.
+
+# Credits
+This is a fork of [FrostyToolsuite/FrostyToolsuite](https://github.com/FrostyToolsuite/FrostyToolsuite), the .NET 8
+rewrite of the [original FrostyToolsuite](https://github.com/CadeEvs/FrostyToolsuite). All the Frostbite format work
+comes from the Frosty team; this fork adds the Linux mod manager, packaging and the changes listed above. Questions
+about this fork belong in its [issues](https://github.com/Sallvainian/FrostyToolsuite/issues), not on the upstream
+Discord.
+
+If you want to contribute to upstream Frosty, read their [CodingStandards.cs](CodingStandards.cs) and join the
+[Frosty Discord](https://discord.gg/sB8ZUAT).
+
+Licensed under the [GPL-3.0](LICENSE). Third-party notices are in [NOTICE.md](NOTICE.md).
