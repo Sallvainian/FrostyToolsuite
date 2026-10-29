@@ -390,9 +390,11 @@ public class TypeSdkGenerator
 
         List<AdditionalText> meta = new();
 
-        if (Directory.Exists("Meta"))
+        // resolve against the install dir, not the cwd, otherwise running the tool from anywhere else skips the meta
+        string metaPath = Path.Combine(Utils.Utils.BaseDirectory, "Meta");
+        if (Directory.Exists(metaPath))
         {
-            foreach (string additionalTextPath in Directory.EnumerateFiles("Meta"))
+            foreach (string additionalTextPath in Directory.EnumerateFiles(metaPath))
             {
                 meta.Add(new CustomAdditionalText(additionalTextPath));
             }

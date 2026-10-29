@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <LangVersion>latest</LangVersion>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <PublishSingleFile>true</PublishSingleFile>
+        <Version>2.0.0</Version>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.0.10" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.10" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\FrostyModSupport\FrostyModSupport.csproj" />
+        <ProjectReference Include="..\FrostySdk\FrostySdk.csproj" />
+    </ItemGroup>
+
+    <!-- share the profiles, sdk strings and the wine bcrypt shim with the cli instead of duplicating them -->
+    <ItemGroup>
+        <None Include="..\FrostyCli\Profiles\*.json" Link="Profiles\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="..\FrostyCli\Sdk\Strings\*.json" Link="Sdk\Strings\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="..\FrostyCli\ThirdParty\bcrypt.dll" Link="ThirdParty\bcrypt.dll" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+</Project>
