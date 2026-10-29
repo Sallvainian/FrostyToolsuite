@@ -195,7 +195,7 @@
                   </Border>
                   <TextBlock Classes="h2" Text="Your mod library is empty" HorizontalAlignment="Center"/>
                   <TextBlock Classes="muted" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="340"
-                             Text="Add .fbmod, .fbcollection or .zip files, or drop them anywhere on this window. Frosty 1.x mods are converted automatically."/>
+                             Text="Add .fbmod or .fbcollection files (or the .zip/.rar/.7z from Nexus), or drop them anywhere on this window. Frosty 1.x mods are converted automatically."/>
                 </StackPanel>
               </Panel>
             </DockPanel>

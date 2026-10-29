@@ -15,7 +15,7 @@ public partial class MainWindow : Window
 {
     private static readonly FilePickerFileType s_modFiles = new("Frosty mods")
     {
-        Patterns = new[] { "*.fbmod", "*.fbcollection", "*.zip" }
+        Patterns = new[] { "*.fbmod", "*.fbcollection", "*.zip", "*.rar", "*.7z" }
     };
 
     private static readonly FilePickerFileType s_exeFiles = new("Game executable")

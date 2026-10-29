@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using Frosty.ModSupport;
 using Frosty.ModSupport.Mod;
@@ -11,6 +10,8 @@ using Frosty.Sdk.Managers;
 using Frosty.Sdk.Sdk;
 using Frosty.Sdk.Utils;
 using FrostyModManager.Models;
+using SharpCompress.Archives;
+using SharpCompress.Common;
 
 namespace FrostyModManager.Services;
 
@@ -182,7 +183,7 @@ public sealed class GameSession
 
     /// <summary>
     /// Copies a mod into the managed mods folder, converting Frosty 1.x mods to the current format.
-    /// Zip archives get searched for mods.
+    /// Archives (.zip, .rar, .7z) get searched for mods, Nexus ships most of them that way.
     /// </summary>
     /// <returns>The paths of the imported mods.</returns>
     public List<string> Import(string inPath)
@@ -190,16 +191,17 @@ public sealed class GameSession
         List<string> imported = new();
         Directory.CreateDirectory(ModsDirectory);
 
-        if (Path.GetExtension(inPath).Equals(".zip", StringComparison.OrdinalIgnoreCase))
+        if (IsArchive(inPath))
         {
             string temp = Directory.CreateTempSubdirectory("frosty-import-").FullName;
             try
             {
-                using ZipArchive archive = ZipFile.OpenRead(inPath);
-                foreach (ZipArchiveEntry entry in archive.Entries.Where(e => IsModFile(e.Name)))
+                using IArchive archive = ArchiveFactory.Open(inPath);
+                foreach (IArchiveEntry entry in archive.Entries.Where(e => !e.IsDirectory && IsModFile(e.Key ?? string.Empty)))
                 {
-                    string extracted = Path.Combine(temp, entry.Name);
-                    entry.ExtractToFile(extracted, true);
+                    // flatten, only the file name matters and it keeps entries from escaping the temp dir
+                    string extracted = Path.Combine(temp, Path.GetFileName(entry.Key!));
+                    entry.WriteToFile(extracted, new ExtractionOptions { Overwrite = true });
                     imported.AddRange(Import(extracted));
                 }
 
@@ -218,7 +220,7 @@ public sealed class GameSession
 
         if (!IsModFile(inPath))
         {
-            FrostyLogger.Logger?.LogError($"{Path.GetFileName(inPath)} is not a .fbmod, .fbcollection or .zip.");
+            FrostyLogger.Logger?.LogError($"{Path.GetFileName(inPath)} is not a .fbmod, .fbcollection or an archive (.zip, .rar, .7z).");
             return imported;
         }
 
@@ -289,6 +291,12 @@ public sealed class GameSession
                 FrostyLogger.Logger?.LogError($"Failed to generate mod data: {error}");
                 return false;
         }
+    }
+
+    private static bool IsArchive(string inPath)
+    {
+        string extension = Path.GetExtension(inPath).ToLowerInvariant();
+        return extension is ".zip" or ".rar" or ".7z";
     }
 
     private static bool IsModFile(string inPath)
