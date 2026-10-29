@@ -224,3 +224,21 @@ AppPackages/
 #####
 # End of core ignore list, below put you custom 'per project' settings (patterns or path)
 #####
+# Frosty runtime data, written next to the executable when it runs from the repo (Windows, or FROSTY_DATA_DIR)
+# game keys and oodle are proprietary and must never be committed
+**/Keys/
+*.initfs.key
+initFs.key
+**/ThirdParty/liboo2core.*
+oo2core_*
+# generated type sdks; the tracked FrostyEditor/Sdk/starwarsii.dll stays tracked
+**/Sdk/*.dll
+!FrostyEditor/Sdk/starwarsii.dll
+**/Caches/
+**/Handlers/
+**/ModData/
+**/Mods/
+*.fbmod
+*.fbcollection
+ModManager.json
+editor_config.json
