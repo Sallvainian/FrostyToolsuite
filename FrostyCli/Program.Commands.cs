@@ -116,4 +116,22 @@ internal static partial class Program
         updateModCommand.SetHandler(CreateMod, gameArg, pidOption, key1Option, key2Option, key3Option, projectArg,
             outputOption);
     }
+
+    private static void AddFindInitFsKeyCommand(RootCommand rootCommand)
+    {
+        Option<FileInfo?> outputOption = new(
+            name: "--output",
+            description: "The path where the key should be saved to, defaults to initfs.key in the current directory.");
+
+        Command findKeyCommand = new("find-initfs-key",
+            "Recovers the initfs key from the memory of the running game (Linux only).")
+        {
+            gameArg,
+            pidOption,
+            outputOption
+        };
+        rootCommand.AddCommand(findKeyCommand);
+
+        findKeyCommand.SetHandler(FindInitFsKey, gameArg, pidOption, outputOption);
+    }
 }

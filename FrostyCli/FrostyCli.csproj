@@ -19,6 +19,7 @@
     <ItemGroup>
       <None Update="Profiles\*.json" CopyToOutputDirectory="PreserveNewest" />
       <None Update="Sdk\Strings\*.json" CopyToOutputDirectory="PreserveNewest" />
+      <None Update="ThirdParty\bcrypt.dll" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
     <ItemGroup>

@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using Frosty.Sdk.IO;
+using Frosty.Sdk.IO.Compression;
 using Frosty.Sdk.Managers.CatResources;
 using Frosty.Sdk.Managers.Infos;
 using Frosty.Sdk.Managers.Infos.FileInfos;
@@ -79,8 +80,8 @@ public static class ResourceManager
             }
         }
 
-        // get oodle libs from unreal
-        if (Directory.EnumerateFiles(FileSystemManager.BasePath, "oo2core_*").Any())
+        // get oodle libs from unreal, some games (e.g. Dead Space) link oodle statically so there is no oo2core dll
+        if (Directory.EnumerateFiles(FileSystemManager.BasePath, "oo2core_*").Any() || ProfileUsesOodle())
         {
             string oodleSo = Path.Combine(Utils.Utils.BaseDirectory, "ThirdParty", "liboo2core.so");
             string oodleDll = Path.Combine(Utils.Utils.BaseDirectory, "ThirdParty", "liboo2core.dll");
@@ -132,6 +133,16 @@ public static class ResourceManager
 
         IsInitialized = true;
         return true;
+    }
+
+    private static bool ProfileUsesOodle()
+    {
+        static bool IsOodle(CompressionType inType) =>
+            (inType & ~CompressionType.Obfuscated) is CompressionType.OodleKraken or CompressionType.OodleSelkie
+                or CompressionType.OodleLeviathan;
+
+        return IsOodle(ProfilesLibrary.EbxCompression) || IsOodle(ProfilesLibrary.ResCompression) ||
+               IsOodle(ProfilesLibrary.ChunkCompression) || IsOodle(ProfilesLibrary.TextureChunkCompression);
     }
 
     public static long GetSize(Sha1 sha1)

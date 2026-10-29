@@ -32,6 +32,8 @@ internal static partial class Program
 
         AddCreateModCommand(rootCommand);
 
+        AddFindInitFsKeyCommand(rootCommand);
+
         rootCommand.SetHandler(InteractiveMode, key1Option, key2Option, key3Option);
 
         return rootCommand.InvokeAsync(args).Result;
