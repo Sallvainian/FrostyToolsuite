@@ -11,7 +11,7 @@ the mod manager (`frosty-mod-manager`) and the command line tool (`frosty`).
 |---|---|---|
 | `.AppImage` | any distro, including immutable ones (Bazzite, SteamOS, Silverblue) | `chmod +x` it and run it; `<appimage> cli --help` runs the CLI |
 | `.tar.xz` / `.tar.gz` | any distro, no root | extract, then `./install.sh` (adds an app-menu entry and `~/.local/bin` commands; `--uninstall` removes them) |
-| `.deb` | Debian, Ubuntu, Mint, Pop!_OS | `sudo apt install ./frosty-mod-manager_*.deb` |
+| `.deb` | Debian, Ubuntu, Mint, Pop!_OS | `sudo apt install ./frosty-mod-manager-*.deb` |
 | `.rpm` | Fedora, openSUSE | `sudo dnf install ./frosty-mod-manager-*.rpm` |
 | `.pkg.tar.zst` | Arch, Manjaro, EndeavourOS, CachyOS | `sudo pacman -U frosty-mod-manager-*.pkg.tar.zst` |
 

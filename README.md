@@ -48,7 +48,7 @@ no .NET install is needed.
 |---|---|---|
 | `.AppImage` | Any distro, including immutable ones (Bazzite, SteamOS, Fedora Atomic) | `chmod +x` it and run it. `<appimage> cli --help` runs the CLI. |
 | `.tar.xz` / `.tar.gz` | Any distro, without root | Extract, then run `./install.sh`. It adds an app-menu entry and `~/.local/bin` commands. `--uninstall` removes them. |
-| `.deb` | Debian, Ubuntu, Mint, Pop!_OS | `sudo apt install ./frosty-mod-manager_*.deb` |
+| `.deb` | Debian, Ubuntu, Mint, Pop!_OS | `sudo apt install ./frosty-mod-manager-*.deb` |
 | `.rpm` | Fedora, openSUSE | `sudo dnf install ./frosty-mod-manager-*.rpm` |
 | `.pkg.tar.zst` | Arch, Manjaro, EndeavourOS, CachyOS | `sudo pacman -U frosty-mod-manager-*.pkg.tar.zst` |
 

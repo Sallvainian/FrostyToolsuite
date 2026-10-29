@@ -11,7 +11,8 @@ WORK="$HERE/.work"
 DIST="$HERE/dist"
 TOOLS="$HERE/.tools"
 NAME="frosty-mod-manager"
-BASENAME="$NAME-$VERSION-linux-x64"
+# every file is named <name>-<version>-x86_64.<format>
+BASENAME="$NAME-$VERSION-x86_64"
 
 NFPM_VERSION="2.48.0"
 APPIMAGETOOL_VERSION="1.9.1"
@@ -73,13 +74,9 @@ chmod +x "$WRAPPERS"/*
 sed -e "s|\${VERSION}|$VERSION|g" -e "s|\${STAGE}|$STAGE|g" -e "s|\${WRAPPERS}|$WRAPPERS|g" \
     "$HERE/nfpm.yaml" > "$WORK/nfpm.yaml"
 cd "$HERE"
-for packager in deb rpm archlinux; do
-    "$TOOLS/nfpm" package -f "$WORK/nfpm.yaml" -p "$packager" -t "$DIST/"
-done
-
-# GitHub turns the ~ that deb/rpm use for prereleases into a . when uploading, name them that way up front
-for file in "$DIST"/*~*; do
-    [[ -e "$file" ]] && mv "$file" "${file//\~/.}"
+# the package managers read name and version from the metadata, so the file names can match the other formats
+for format in deb:deb rpm:rpm archlinux:pkg.tar.zst; do
+    "$TOOLS/nfpm" package -f "$WORK/nfpm.yaml" -p "${format%%:*}" -t "$DIST/$BASENAME.${format#*:}"
 done
 
 (cd "$DIST" && sha256sum -- * > SHA256SUMS)
