@@ -10,7 +10,7 @@
 </p>
 
 > [!WARNING]
-> This is an **alpha** build of a fork of the in-development FrostyToolsuite v2 rewrite. It has been tested with
+> This is a fork built on the in-development FrostyToolsuite v2 rewrite. It has been tested with
 > **Dead Space (2023)** on Steam with Proton. Other Frostbite games have profiles but are untested here.
 >
 > **Use at your own risk**, and use *Restore vanilla* before Steam updates or verifies a modded game.
@@ -89,10 +89,10 @@ dotnet build
 
 To build the same packages as a release, run the packaging script. The output goes to `packaging/linux/dist`:
 ```bash
-packaging/linux/build.sh 2.0.0
+packaging/linux/build.sh 1.0.0
 ```
 Pushing a `v*` tag runs the same script on GitHub Actions and publishes a release. Tags with a `-` suffix, like
-`v2.0.0-alpha.1`, are published as prereleases.
+`v1.1.0-beta.1`, are published as prereleases.
 
 # Project structure
 

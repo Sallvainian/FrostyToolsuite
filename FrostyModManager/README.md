@@ -20,7 +20,7 @@ installed, so switching formats keeps everything. Set `FROSTY_DATA_DIR` to use a
 
 ## Build
 ```bash
-packaging/linux/build.sh 2.0.0        # every format into packaging/linux/dist
+packaging/linux/build.sh 1.0.0        # every format into packaging/linux/dist
 ```
 Pushing a `v*` tag builds the same set on GitHub Actions and publishes it as a release. For a quick local build of just
 the app:

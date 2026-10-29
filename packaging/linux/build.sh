@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Builds every Linux release format of Frosty Mod Manager (with the frosty CLI) into packaging/linux/dist:
 #   tar.gz, tar.xz, AppImage, deb, rpm and pkg.tar.zst
-# Usage: packaging/linux/build.sh <version>   e.g. 2.0.0 or 2.0.0-alpha.1
+# Usage: packaging/linux/build.sh <version>   e.g. 1.0.0 or 1.1.0-beta.1
 set -euo pipefail
 
 VERSION="${1:?usage: build.sh <version>}"
